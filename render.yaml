@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: after-hours-community
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run db:seed && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: PGSSLMODE
+        value: require
+      - key: NODE_ENV
+        value: production
