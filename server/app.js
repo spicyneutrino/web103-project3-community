@@ -1,15 +1,29 @@
-import express from 'express';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import events from './routes/events.js';
-import locations from './routes/locations.js';
-import { pool } from './config/database.js';
-export const app=express();
-app.disable('x-powered-by');
-app.use('/api/events',events); app.use('/api/locations',locations);
-app.get('/api/health',async(req,res)=> { await pool.query('SELECT 1'); res.json({status:'ok',database:'PostgreSQL'}); });
-app.use('/api', (req,res)=>res.status(404).json({error:'API route not found.'}));
-const dist=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../dist');
+import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import events from "./routes/events.js";
+import locations from "./routes/locations.js";
+import { pool } from "./config/database.js";
+export const app = express();
+app.disable("x-powered-by");
+app.use("/api/events", events);
+app.use("/api/locations", locations);
+app.get("/api/health", async (req, res) => {
+  await pool.query("SELECT 1");
+  res.json({ status: "ok", database: "PostgreSQL" });
+});
+app.use("/api", (req, res) =>
+  res.status(404).json({ error: "API route not found." }),
+);
+const dist = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../dist",
+);
 app.use(express.static(dist));
-app.get('/{*path}',(req,res)=>res.sendFile(path.join(dist,'index.html')));
-app.use((err,req,res,next)=> { console.error('Request failed:',err.message); res.status(500).json({error:'Unable to load community data. Please try again.'}); });
+app.get("/{*path}", (req, res) => res.sendFile(path.join(dist, "index.html")));
+app.use((err, req, res, next) => {
+  console.error("Request failed:", err.message);
+  res
+    .status(500)
+    .json({ error: "Unable to load community data. Please try again." });
+});
